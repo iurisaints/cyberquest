@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cybersecurity Quest — Cifras de Fluxo &amp; WEP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+  <div class="mx-auto max-w-7xl px-4 py-6">
+    <!-- Header -->
+    <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest text-cyan-400">Laboratório interativo</p>
+        <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Cybersecurity Quest</h1>
+        <p class="mt-1 text-sm text-slate-400">Cifras de fluxo, RC4 e arquitetura WEP — 12 níveis progressivos.</p>
+
+        <p class="mt-1 text-sm text-slate-400">Professor Iuri Santos</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="level-badge" class="rounded-full border border-slate-700 bg-slate-900 px-4 py-1.5 font-mono text-sm text-slate-300">Nível 1 / 12</span>
+        <button id="btn-reset" type="button" class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700">Reiniciar tudo</button>
+      </div>
+    </header>
+
+    <!-- Progress -->
+    <div class="mb-6">
+      <div class="mb-2 flex justify-between text-xs text-slate-400">
+        <span>Progresso geral</span>
+        <span id="progress-text">0% — complete os desafios para liberar o enlace sem fio</span>
+      </div>
+      <div class="h-3 overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700">
+        <div id="progress-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <!-- Left: theory + inputs -->
+      <div class="flex flex-col gap-4">
+        <nav class="flex flex-wrap gap-2 rounded-xl border border-slate-800 bg-slate-900/80 p-3" id="level-tabs"></nav>
+
+        <article class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl shadow-black/40">
+          <h2 id="panel-title" class="text-xl font-bold text-white"></h2>
+          <div id="panel-theory" class="prose prose-invert mt-4 max-w-none text-sm leading-relaxed text-slate-300 prose-p:my-2 prose-strong:text-white"></div>
+
+          <div class="mt-6 space-y-4 border-t border-slate-800 pt-6" id="challenge-area"></div>
+
+          <div class="mt-6 flex flex-wrap items-center gap-3">
+            <button id="btn-check" type="button" class="rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-6 py-3 font-bold text-white shadow-lg shadow-cyan-900/30 hover:from-cyan-500 hover:to-blue-500">Verificar &amp; transmitir</button>
+            <p id="feedback" class="text-sm font-medium"></p>
+          </div>
+        </article>
+
+        <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-4 text-xs text-slate-400">
+          <strong class="text-slate-300">Legenda dos bits:</strong>
+          <span class="ml-2 inline-flex items-center gap-1"><span class="inline-block h-3 w-3 rounded bg-msg"></span> Mensagem</span>
+          <span class="ml-3 inline-flex items-center gap-1"><span class="inline-block h-3 w-3 rounded bg-key"></span> Keystream</span>
+          <span class="ml-3 inline-flex items-center gap-1"><span class="inline-block h-3 w-3 rounded bg-ciph"></span> Cifrado</span>
+        </div>
+      </div>
+
+      <!-- Right: visualization -->
+      <div class="flex flex-col gap-4">
+        <div class="relative min-h-[420px] rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-4 shadow-inner">
+          <div class="absolute left-4 top-4 z-10 rounded-lg border border-slate-700 bg-slate-900/90 px-3 py-1.5 font-mono text-xs text-slate-400">Canal sem fio (visualização)</div>
+
+          <!-- Bit lanes -->
+          <div id="viz-bits" class="relative z-10 mx-auto mt-12 max-w-lg space-y-3"></div>
+
+          <!-- Wireless lane -->
+          <div class="relative mx-auto mt-10 h-32 max-w-2xl">
+            <div class="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent"></div>
+            <div class="absolute left-[8%] top-1/2 flex -translate-y-1/2 flex-col items-center gap-1">
+              <div class="rounded-lg border border-blue-500/40 bg-blue-950/50 px-2 py-1 font-mono text-[10px] text-blue-300">TX</div>
+            </div>
+            <div class="absolute right-[8%] top-1/2 flex -translate-y-1/2 flex-col items-center gap-1">
+              <div class="rounded-lg border border-emerald-500/40 bg-emerald-950/50 px-2 py-1 font-mono text-[10px] text-emerald-300">RX</div>
+            </div>
+            <!-- Animated waves -->
+            <div class="pointer-events-none absolute left-1/4 right-1/4 top-1/2 flex h-16 -translate-y-1/2 items-end justify-between gap-1 opacity-40">
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0s"></span>
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0.1s"></span>
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0.2s"></span>
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0.3s"></span>
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0.4s"></span>
+              <span class="w-1 rounded-t bg-cyan-400 wave-bar" style="animation-delay: 0.5s"></span>
+            </div>
+            <div id="packet-layer" class="absolute inset-0"></div>
+          </div>
+
+          <p id="viz-caption" class="mt-6 text-center text-xs text-slate-500"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* CryptoStream Quest — estilos da aplicação (além do Tailwind) */
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.bit-cell {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bit-msg {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.bit-key {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.bit-ciph {
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+}
+
+@keyframes float-packet {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(45%) translateY(-12px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(92%) translateY(0);
+    opacity: 0.95;
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scaleY(1.15);
+  }
+}
+
+.packet-run {
+  animation: float-packet 2.2s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+
+.wave-bar {
+  animation: wave 1.2s ease-in-out infinite;
+}
